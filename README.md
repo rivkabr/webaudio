@@ -17,6 +17,8 @@ You can download it from: `https://github.com/viebel/webaudio/blob/master/resour
 
 Deployment (to [clojars](https://clojars.org/))
 ------------------------------------
+Update the version number in `project.clj` and then execute:
+
 ```
 lein deploy clojars
 ```
