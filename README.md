@@ -3,7 +3,14 @@ webaudio
 
 `webaudio` is a clojurescript interface to part of the HTML5 Audio API.
 
-It provides also many more functions to acces the API.
+It provides also many more functions to access the API:
+
+* `decode-data` for `ogg` file through the native API
+* `decode-data` for `flac` file through [aurora](https://github.com/audiocogs/aurora.js)
+* `set-volume-speakers`
+* `pcm->buffer`
+* `stereo->4chan`
+
 
 Usage
 -----
