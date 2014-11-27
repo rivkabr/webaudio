@@ -15,7 +15,7 @@ and in addition you have to add `aurora.js` to your project.
 You can download it from: `https://github.com/viebel/webaudio/blob/master/resources/aurora.js`
 
 
-Deployment (to https://clojars.org/)
+Deployment (to [clojars](https://clojars.org/))
 ------------------------------------
 ```
 lein deploy clojars
