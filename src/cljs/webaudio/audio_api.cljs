@@ -65,11 +65,13 @@
 
 (defn decode-data [context data]
   (let [c (chan)]
-    (!> context.decodeAudioData data
-        #(put! c %)
-        #(do (print "error in decode-data" %)
-             (close! c)))
-    c))
+    (try
+      (!> context.decodeAudioData data
+          #(put! c [:ok %])
+          #(put! c [:error %]))
+      (catch js/Object e
+        (put! c [:error e])))
+      c))
 
 (defn stop [node
             & {:keys [delay-in-sec] :or {delay-in-sec 0}}]
