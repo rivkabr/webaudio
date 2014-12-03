@@ -24,7 +24,7 @@
 (defn create-oscillator
   ([context] (!> context.createOscillator))
   ([context value]
-    (let [oscillator (!> context.createOscillator)]
+    (let [oscillator (create-oscillator context)]
       (! oscillator.frequency.value value)
       oscillator)))
 
