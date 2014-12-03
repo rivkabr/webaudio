@@ -1,4 +1,4 @@
-(defproject viebel/webaudio "0.0.1"
+(defproject viebel/webaudio "0.0.3"
   :description "Web Audio API (and more) in cljs"
   :url "https://github.com/viebel/webaudio"
   :license {:name "Eclipse Public License"

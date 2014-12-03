@@ -6,14 +6,16 @@
     (IndexedSeq. arr 0))
 
 (defn decode-data [data]
-  (let [c (chan)
-        asset (!> js/AV.Asset.fromBuffer data)]
-    (!> asset.on "error" (fn [e]
-                           (print "error:" e)
-                           (close! c)))
-    (!> asset.on "format"
-        (fn [the-format]
-          (!> asset.decodeToBuffer (fn [data]
-                                     (put! c [(? the-format.sampleRate) (to-regular-array data) data])))))
-    (!> asset.start)
+  (let [c (chan)]
+    (try
+      (let  [asset (!> js/AV.Asset.fromBuffer data)]
+        (!> asset.on "error" (fn [e]
+                              (put! c [:error e])))
+        (!> asset.on "format"
+         (fn [the-format]
+            (!> asset.decodeToBuffer (fn [data]
+                                       (put! c [:ok [(? the-format.sampleRate) (to-regular-array data) data]])))))
+        (!> asset.start))
+      (catch js/Object e
+        (put! c [:error (str "Error in decoding data: " e)])))
     c))
