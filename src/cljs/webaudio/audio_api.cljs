@@ -21,11 +21,27 @@
 (defn create-gains [context n]
     (repeatedly 2 (partial create-gain context)))
 
+(defn create-oscillator
+  ([context] (!> context.createOscillator))
+  ([context value]
+    (let [oscillator (create-oscillator context)]
+      (! oscillator.frequency.value value)
+      oscillator)))
+
+(defn create-buffer [context numOfChannels length sampleRate]
+  (!> context.createBuffer numOfChannels length sampleRate))
+
+(defn create-buffer-source [context]
+  (!> context.createBufferSource))
+
 (defn num-of-speakers [context]
   (? context.destination.maxChannelCount))
 
 (defn name-of-speakers [context]
   (take (num-of-speakers context) speakers))
+
+(defn get-channel-data [buffer channel]
+  (!> buffer.getChannelData channel))
 
 (defn set-gain 
   ([node value] (! node.gain.value value))
@@ -43,8 +59,14 @@
   ([node volume num-speakers rampup-duration-in-sec] (set-volume node (audio/volume-splitted volume num-speakers) rampup-duration-in-sec))
   ([node volume num-speakers] (set-volume-speakers node volume num-speakers 0)))
 
+(defn set-buffer [node buffer]
+  (! node.buffer buffer))
+
+(defn set-loop [node loop?]
+  (! node.loop loop?))
+
 (defn pcm->buffer [context pcm-js-array [start stop] sample-rate]
-  (let [buffer (!> context.createBuffer 1 (- stop start) sample-rate)]
+  (let [buffer (create-buffer context 1 (- stop start) sample-rate)]
     (fill-js-array (!> buffer.getChannelData 0) pcm-js-array start stop)
     buffer))
 
@@ -52,7 +74,7 @@
   (let [sample-rate (? buff-stereo.sampleRate)
         pcm-left (!> buff-stereo.getChannelData 0)
         pcm-right (!> buff-stereo.getChannelData 1)
-        buffer (!> context.createBuffer 4 (alength pcm-left) sample-rate)]
+        buffer (create-buffer context 4 (alength pcm-left) sample-rate)]
     (fill-js-array (!> buffer.getChannelData 0) pcm-left)
     (fill-js-array (!> buffer.getChannelData 2) pcm-left)
     (fill-js-array (!> buffer.getChannelData 1) pcm-right)
@@ -60,7 +82,7 @@
     buffer))
 
 (defn create-node-with-buffer [context buffer]
-  (let [node (!> context.createBufferSource)]
+  (let [node (create-buffer-source context)]
     (! node.buffer buffer)))
 
 (defn decode-data [context data]
@@ -78,7 +100,7 @@
   (!> node.stop (+ delay-in-sec (? node.context.currentTime)))
   node)
 
-(defn start [node 
+(defn start [node
              & {:keys [offset-in-sec delay-in-sec] :or {offset-in-sec 0 delay-in-sec 0}}]
   (!> node.start (+ delay-in-sec (? node.context.currentTime)) offset-in-sec)
   node)
